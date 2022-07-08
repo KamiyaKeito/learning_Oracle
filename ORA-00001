@@ -1,0 +1,54 @@
+/* ORA-00001
+一意制約違反
+*/
+
+//原因データの探し方
+dbms_errlog.create_error_log('dest');  --エラーロギング用のテーブルを作成する。
+ 
+desc err$_dest  --作成したテーブルを確認する。以下のように表示される。
+-- 名前                                      NULL?    型
+-- ----------------------------------------- -------- ----------------------------
+-- ORA_ERR_NUMBER$                                    NUMBER
+-- ORA_ERR_MESG$                                      VARCHAR2(2000)
+-- ORA_ERR_ROWID$                                     ROWID
+-- ORA_ERR_OPTYP$                                     VARCHAR2(2)
+-- ORA_ERR_TAG$                                       VARCHAR2(2000)
+-- ID                                                 VARCHAR2(4000)
+-- NUM                                                VARCHAR2(4000)
+
+insert into dest select * from src LOG ERRORS REJECT LIMIT UNLIMITED; --エラー内容をテーブルに入れる。
+
+select id, num, ora_err_mesg$ from err$_dest; --テーブルに入れたエラー内容を表示する。以下のように表示される。
+--ID       NUM      ORA_ERR_MESG$
+---------- -------- ------------------------------------------------------------
+--1        200      ORA-00001: 一意制約(RIVUS.SYS_C0012335)に反しています
+
+DROP TABLE err$_dest;  --エラーの原因レコードを見つけられたら削除しておく
+
+//テストデータ
+SQL> CREATE TABLE SRC (
+  2    ID   NUMBER,
+  3    NUM  NUMBER
+  4  );
+表が作成されました。
+ 
+SQL> CREATE TABLE DEST (
+  2    ID   NUMBER PRIMARY KEY, /* プライマリキー */
+  3    NUM  NUMBER
+  4  );
+表が作成されました。
+ 
+SQL> INSERT INTO SRC VALUES ( 1, 100);
+1行が作成されました。
+ 
+SQL> INSERT INTO SRC VALUES ( 1, 200);
+1行が作成されました。
+ 
+SQL> INSERT INTO SRC VALUES ( 2, 300);
+1行が作成されました。
+ 
+SQL> INSERT INTO DEST SELECT * FROM SRC;
+INSERT INTO DEST SELECT * FROM SRC
+*
+行1でエラーが発生しました。:
+ORA-00001: 一意制約(RIVUS.SYS_C0012335)に反しています
