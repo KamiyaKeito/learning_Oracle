@@ -1,0 +1,19 @@
+/* 文字列用データ型
+BYTE指定とCHAR指定がある。
+VARCHAR2とNVARCHAR2がある。
+*/
+
+//sample
+VARCHAR2(20 BYTE) //20バイト格納できる。
+VARCHAR2(20 CHAR) //20文字格納できる。
+NVARCHAR2(20)     //Unicodeを20文字格納できる。
+
+//VARCHAR2とNVARCHAR2の違い
+全角文字が多く格納される場合は、NVARCHAR2の方がバイト数が少なくなる。
+半角文字の数値やアルファベットが多く格納される場合は、VARCHAR2の方がバイト数が少なくなる。
+仕様は以下の通り。
+VARCHAR2	1～4バイト（一般的な全角文字は3バイト）
+NVARCHAR2	2または4バイト（一般的な全角文字は2バイト）
+
+//VARCHAR2とNVARCHAR2のどちらを使うべきか
+特殊な条件がないのであれば、汎用性の高いVARCHAR2を推奨。
